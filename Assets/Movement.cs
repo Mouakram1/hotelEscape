@@ -5,15 +5,25 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    public float moveSpeed = 7f;
+    public float moveSpeed = 5f;
 
     public KeyCode L = KeyCode.LeftArrow;
     public KeyCode R = KeyCode.RightArrow;
     public KeyCode U = KeyCode.UpArrow;
     public KeyCode D = KeyCode.DownArrow;
+    private Rigidbody2D rb;
+    private Animator animator;
+    private Vector2 movement;
+
 
     void Start()
     {
+        rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
+
+        // Top-down game
+        rb.gravityScale = 0f;
+        rb.freezeRotation = true;
     }
 
     void Update()
@@ -40,20 +50,30 @@ public class Movement : MonoBehaviour
         {
             vertical = -1f;
         }
-
-        Vector2 movement = new Vector2(horizontal, vertical).normalized;
-
-        GetComponent<Rigidbody2D>().velocity = movement * moveSpeed;
-
-        if (horizontal < 0)
+        if (horizontal != 0)
         {
-            if (GetComponent<SpriteRenderer>() != null)
-                GetComponent<SpriteRenderer>().flipX = true;
+            vertical = 0;
         }
-        else if (horizontal > 0)
-        {
-            if (GetComponent<SpriteRenderer>() != null)
-                GetComponent<SpriteRenderer>().flipX = false;
-        }
+
+        movement = new Vector2(horizontal, vertical);
+        animator.SetFloat("MoveX", horizontal);
+        animator.SetFloat("MoveY", vertical);
+        animator.SetFloat("Speed", movement.sqrMagnitude);
+
+        // if (horizontal < 0)
+        // {
+        //     if (GetComponent<SpriteRenderer>() != null)
+        //         GetComponent<SpriteRenderer>().flipX = true;
+        // }
+        // else if (horizontal > 0)
+        // {
+        //     if (GetComponent<SpriteRenderer>() != null)
+        //         GetComponent<SpriteRenderer>().flipX = false;
+        // }
+    }
+
+    void FixedUpdate()
+    {
+        rb.velocity = movement * moveSpeed;
     }
 }
